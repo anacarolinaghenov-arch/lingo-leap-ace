@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { Headphones, Film, BookOpen, Music, Tv, Youtube } from "lucide-react";
+import { Headphones, Film, BookOpen, Music, Tv, Youtube, Sparkles, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/imersao")({
   head: () => ({ meta: [{ title: "Voa — Imersão Inteligente" }] }),
