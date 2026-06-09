@@ -1,18 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { Flame, Trophy, Crown, Settings, ChevronRight } from "lucide-react";
+import { Flame, Trophy, Crown, Settings, ChevronRight, Check, Palette } from "lucide-react";
+import { ACCENT_PRESETS, useProfile, updateProfile, type AccentKey } from "@/lib/profile-store";
+import { applyAccent } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/perfil")({
-  head: () => ({ meta: [{ title: "Voa — Perfil" }] }),
+  head: () => ({ meta: [{ title: "flui — Perfil" }] }),
   component: Perfil,
 });
 
 function Perfil() {
+  const profile = useProfile();
+  const name = profile?.name ?? "Marina Alves";
+  const initial = name.charAt(0).toUpperCase();
+  const currentAccent: AccentKey = profile?.accent ?? "lime";
+
+  function pickColor(k: AccentKey) {
+    applyAccent(k);
+    if (profile) updateProfile({ accent: k });
+  }
+
   return (
     <AppShell>
       <PageHeader
         eyebrow="Perfil"
-        title="Marina Alves"
+        title={name}
         action={
           <button className="size-10 rounded-full bg-surface border border-border flex items-center justify-center">
             <Settings className="size-4" />
@@ -24,7 +36,7 @@ function Perfil() {
       <section className="px-5">
         <div className="rounded-3xl bg-surface border border-border p-5 flex items-center gap-4">
           <div className="size-16 rounded-full bg-gradient-to-br from-accent to-accent/30 flex items-center justify-center font-display text-2xl font-semibold text-accent-foreground">
-            M
+            {initial}
           </div>
           <div className="flex-1">
             <p className="text-sm text-muted-foreground">Nível atual</p>

@@ -7,7 +7,7 @@ const tabs = [
   { to: "/conversa", label: "Conversa", icon: MessagesSquare },
   { to: "/shadowing", label: "Shadow", icon: Mic },
   { to: "/imersao", label: "Imersão", icon: Compass },
-  { to: "/intercambio", label: "Voa", icon: Plane },
+  { to: "/intercambio", label: "Plano", icon: Plane },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
