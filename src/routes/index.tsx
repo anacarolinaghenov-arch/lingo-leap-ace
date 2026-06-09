@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useProfile } from "@/lib/profile-store";
 import { Flame, ArrowUpRight, Mic, MessagesSquare, Compass, Plane, Sparkle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voa — Início" },
+      { title: "flui — Início" },
       { name: "description", content: "Seu progresso para a fluência real." },
     ],
   }),
@@ -13,6 +15,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const navigate = useNavigate();
+  const profile = useProfile();
+  useEffect(() => {
+    if (typeof window !== "undefined" && profile === null) {
+      const raw = localStorage.getItem("flui_profile_v1");
+      if (!raw) navigate({ to: "/onboarding" });
+    }
+  }, [profile, navigate]);
+
+  const firstName = profile?.name?.split(" ")[0] ?? "Marina";
   return (
     <AppShell>
       <header className="px-5 pt-10 pb-2 flex items-center justify-between">
