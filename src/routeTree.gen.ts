@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShadowingRouteImport } from './routes/shadowing'
 import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as IntercambioRouteImport } from './routes/intercambio'
 import { Route as ImersaoRouteImport } from './routes/imersao'
 import { Route as ConversaRouteImport } from './routes/conversa'
@@ -24,6 +25,11 @@ const ShadowingRoute = ShadowingRouteImport.update({
 const PerfilRoute = PerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntercambioRoute = IntercambioRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/conversa': typeof ConversaRoute
   '/imersao': typeof ImersaoRoute
   '/intercambio': typeof IntercambioRoute
+  '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/shadowing': typeof ShadowingRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/conversa': typeof ConversaRoute
   '/imersao': typeof ImersaoRoute
   '/intercambio': typeof IntercambioRoute
+  '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/shadowing': typeof ShadowingRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/conversa': typeof ConversaRoute
   '/imersao': typeof ImersaoRoute
   '/intercambio': typeof IntercambioRoute
+  '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/shadowing': typeof ShadowingRoute
 }
@@ -79,16 +88,25 @@ export interface FileRouteTypes {
     | '/conversa'
     | '/imersao'
     | '/intercambio'
+    | '/onboarding'
     | '/perfil'
     | '/shadowing'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/conversa' | '/imersao' | '/intercambio' | '/perfil' | '/shadowing'
+  to:
+    | '/'
+    | '/conversa'
+    | '/imersao'
+    | '/intercambio'
+    | '/onboarding'
+    | '/perfil'
+    | '/shadowing'
   id:
     | '__root__'
     | '/'
     | '/conversa'
     | '/imersao'
     | '/intercambio'
+    | '/onboarding'
     | '/perfil'
     | '/shadowing'
   fileRoutesById: FileRoutesById
@@ -98,6 +116,7 @@ export interface RootRouteChildren {
   ConversaRoute: typeof ConversaRoute
   ImersaoRoute: typeof ImersaoRoute
   IntercambioRoute: typeof IntercambioRoute
+  OnboardingRoute: typeof OnboardingRoute
   PerfilRoute: typeof PerfilRoute
   ShadowingRoute: typeof ShadowingRoute
 }
@@ -116,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/perfil'
       fullPath: '/perfil'
       preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/intercambio': {
@@ -154,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConversaRoute: ConversaRoute,
   ImersaoRoute: ImersaoRoute,
   IntercambioRoute: IntercambioRoute,
+  OnboardingRoute: OnboardingRoute,
   PerfilRoute: PerfilRoute,
   ShadowingRoute: ShadowingRoute,
 }
