@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { Headphones, Film, BookOpen, Music, Tv, Youtube } from "lucide-react";
+import { Headphones, Film, BookOpen, Music, Tv, Youtube, Sparkles, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/imersao")({
   head: () => ({ meta: [{ title: "Voa — Imersão Inteligente" }] }),
@@ -11,6 +11,29 @@ function Imersao() {
   return (
     <AppShell>
       <PageHeader eyebrow="Imersão Inteligente" title="Viva o idioma. Sem sair do quarto." />
+
+      {/* AI Discovery CTA */}
+      <section className="px-5 mb-5">
+        <Link
+          to="/descobrir"
+          className="block rounded-3xl bg-accent text-accent-foreground p-5 relative overflow-hidden glow-accent"
+        >
+          <Sparkles className="absolute -right-3 -top-3 size-24 opacity-15" />
+          <p className="text-[11px] uppercase tracking-[0.22em] font-semibold opacity-70">
+            Novo · flui IA
+          </p>
+          <h3 className="font-display text-xl font-semibold mt-1.5 leading-tight">
+            Diga o tipo de criador, filme ou livro que você curte.
+          </h3>
+          <p className="text-sm mt-2 opacity-80">
+            A IA monta uma lista no seu idioma alvo — por gênero, idade, vibe e nível.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium">
+            Descobrir agora <ChevronRight className="size-4" />
+          </div>
+        </Link>
+      </section>
+
 
       {/* Filter pills */}
       <div className="px-5">
