@@ -293,7 +293,7 @@ function Onboarding() {
               title="Qual cor combina com você?"
               hint="Personalize o seu flui. Pode trocar depois no perfil."
             >
-              <div className="grid grid-cols-3 gap-3 mt-2">
+              <div className="grid grid-cols-4 gap-2.5 mt-2">
                 {(Object.keys(ACCENT_PRESETS) as AccentKey[]).map((k) => {
                   const p = ACCENT_PRESETS[k];
                   const sel = accent === k;
@@ -301,17 +301,17 @@ function Onboarding() {
                     <button
                       key={k}
                       onClick={() => previewAccent(k)}
-                      className={`rounded-2xl border p-3 flex flex-col items-center gap-2 transition ${
+                      className={`rounded-2xl border p-2.5 flex flex-col items-center gap-1.5 transition ${
                         sel ? "border-accent bg-surface" : "border-border bg-surface"
                       }`}
                     >
                       <div
-                        className="size-12 rounded-full flex items-center justify-center"
+                        className="size-10 rounded-full flex items-center justify-center"
                         style={{ background: p.swatch }}
                       >
-                        {sel && <Check className="size-5 text-black" />}
+                        {sel && <Check className="size-4 text-black" />}
                       </div>
-                      <p className="text-[11px] font-medium">{p.label}</p>
+                      <p className="text-[10px] font-medium leading-tight">{p.label}</p>
                     </button>
                   );
                 })}

@@ -85,7 +85,7 @@ function Perfil() {
           </span>
         </div>
         <div className="rounded-3xl bg-surface border border-border p-4">
-          <div className="grid grid-cols-6 gap-2.5">
+          <div className="grid grid-cols-6 gap-2">
             {(Object.keys(ACCENT_PRESETS) as AccentKey[]).map((k) => {
               const p = ACCENT_PRESETS[k];
               const sel = currentAccent === k;
