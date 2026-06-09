@@ -9,8 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShadowingRouteImport } from './routes/shadowing'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as IntercambioRouteImport } from './routes/intercambio'
+import { Route as ImersaoRouteImport } from './routes/imersao'
+import { Route as ConversaRouteImport } from './routes/conversa'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ShadowingRoute = ShadowingRouteImport.update({
+  id: '/shadowing',
+  path: '/shadowing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntercambioRoute = IntercambioRouteImport.update({
+  id: '/intercambio',
+  path: '/intercambio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImersaoRoute = ImersaoRouteImport.update({
+  id: '/imersao',
+  path: '/imersao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConversaRoute = ConversaRouteImport.update({
+  id: '/conversa',
+  path: '/conversa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +49,96 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/conversa': typeof ConversaRoute
+  '/imersao': typeof ImersaoRoute
+  '/intercambio': typeof IntercambioRoute
+  '/perfil': typeof PerfilRoute
+  '/shadowing': typeof ShadowingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/conversa': typeof ConversaRoute
+  '/imersao': typeof ImersaoRoute
+  '/intercambio': typeof IntercambioRoute
+  '/perfil': typeof PerfilRoute
+  '/shadowing': typeof ShadowingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/conversa': typeof ConversaRoute
+  '/imersao': typeof ImersaoRoute
+  '/intercambio': typeof IntercambioRoute
+  '/perfil': typeof PerfilRoute
+  '/shadowing': typeof ShadowingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/conversa'
+    | '/imersao'
+    | '/intercambio'
+    | '/perfil'
+    | '/shadowing'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/conversa' | '/imersao' | '/intercambio' | '/perfil' | '/shadowing'
+  id:
+    | '__root__'
+    | '/'
+    | '/conversa'
+    | '/imersao'
+    | '/intercambio'
+    | '/perfil'
+    | '/shadowing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConversaRoute: typeof ConversaRoute
+  ImersaoRoute: typeof ImersaoRoute
+  IntercambioRoute: typeof IntercambioRoute
+  PerfilRoute: typeof PerfilRoute
+  ShadowingRoute: typeof ShadowingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shadowing': {
+      id: '/shadowing'
+      path: '/shadowing'
+      fullPath: '/shadowing'
+      preLoaderRoute: typeof ShadowingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intercambio': {
+      id: '/intercambio'
+      path: '/intercambio'
+      fullPath: '/intercambio'
+      preLoaderRoute: typeof IntercambioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/imersao': {
+      id: '/imersao'
+      path: '/imersao'
+      fullPath: '/imersao'
+      preLoaderRoute: typeof ImersaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversa': {
+      id: '/conversa'
+      path: '/conversa'
+      fullPath: '/conversa'
+      preLoaderRoute: typeof ConversaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +151,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConversaRoute: ConversaRoute,
+  ImersaoRoute: ImersaoRoute,
+  IntercambioRoute: IntercambioRoute,
+  PerfilRoute: PerfilRoute,
+  ShadowingRoute: ShadowingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
