@@ -1,18 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { Flame, Trophy, Crown, Settings, ChevronRight } from "lucide-react";
+import { Flame, Trophy, Crown, Settings, ChevronRight, Check, Palette } from "lucide-react";
+import { ACCENT_PRESETS, useProfile, updateProfile, type AccentKey } from "@/lib/profile-store";
+import { applyAccent } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/perfil")({
-  head: () => ({ meta: [{ title: "Voa — Perfil" }] }),
+  head: () => ({ meta: [{ title: "flui — Perfil" }] }),
   component: Perfil,
 });
 
 function Perfil() {
+  const profile = useProfile();
+  const name = profile?.name ?? "Marina Alves";
+  const initial = name.charAt(0).toUpperCase();
+  const currentAccent: AccentKey = profile?.accent ?? "lime";
+
+  function pickColor(k: AccentKey) {
+    applyAccent(k);
+    if (profile) updateProfile({ accent: k });
+  }
+
   return (
     <AppShell>
       <PageHeader
         eyebrow="Perfil"
-        title="Marina Alves"
+        title={name}
         action={
           <button className="size-10 rounded-full bg-surface border border-border flex items-center justify-center">
             <Settings className="size-4" />
@@ -24,7 +36,7 @@ function Perfil() {
       <section className="px-5">
         <div className="rounded-3xl bg-surface border border-border p-5 flex items-center gap-4">
           <div className="size-16 rounded-full bg-gradient-to-br from-accent to-accent/30 flex items-center justify-center font-display text-2xl font-semibold text-accent-foreground">
-            M
+            {initial}
           </div>
           <div className="flex-1">
             <p className="text-sm text-muted-foreground">Nível atual</p>
@@ -61,12 +73,46 @@ function Perfil() {
         </div>
       </section>
 
+      {/* Color customization */}
+      <section className="px-5 mt-7">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Palette className="size-4 text-accent" />
+            <h3 className="font-display text-lg font-semibold">Cor do seu flui</h3>
+          </div>
+          <span className="text-[11px] text-muted-foreground">
+            {ACCENT_PRESETS[currentAccent].label}
+          </span>
+        </div>
+        <div className="rounded-3xl bg-surface border border-border p-4">
+          <div className="grid grid-cols-6 gap-2.5">
+            {(Object.keys(ACCENT_PRESETS) as AccentKey[]).map((k) => {
+              const p = ACCENT_PRESETS[k];
+              const sel = currentAccent === k;
+              return (
+                <button
+                  key={k}
+                  onClick={() => pickColor(k)}
+                  aria-label={p.label}
+                  className={`aspect-square rounded-full flex items-center justify-center transition border-2 ${
+                    sel ? "border-foreground scale-95" : "border-transparent"
+                  }`}
+                  style={{ background: p.swatch }}
+                >
+                  {sel && <Check className="size-4 text-black" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Premium */}
       <section className="px-5 mt-7">
         <div className="rounded-3xl bg-accent text-accent-foreground p-5 relative overflow-hidden glow-accent">
           <Crown className="absolute -right-4 -top-4 size-24 opacity-15" />
           <p className="text-[11px] uppercase tracking-[0.22em] font-semibold opacity-70">
-            Voa Premium
+            flui Premium
           </p>
           <h3 className="font-display text-xl font-semibold mt-1.5 leading-tight">
             Conversas ilimitadas + todos os simulados de intercâmbio.

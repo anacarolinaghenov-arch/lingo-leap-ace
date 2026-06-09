@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useProfile } from "@/lib/profile-store";
 import { Flame, ArrowUpRight, Mic, MessagesSquare, Compass, Plane, Sparkle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voa — Início" },
+      { title: "flui — Início" },
       { name: "description", content: "Seu progresso para a fluência real." },
     ],
   }),
@@ -13,14 +15,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const navigate = useNavigate();
+  const profile = useProfile();
+  useEffect(() => {
+    if (typeof window !== "undefined" && profile === null) {
+      const raw = localStorage.getItem("flui_profile_v1");
+      if (!raw) navigate({ to: "/onboarding" });
+    }
+  }, [profile, navigate]);
+
+  const firstName = profile?.name?.split(" ")[0] ?? "Marina";
   return (
     <AppShell>
       <header className="px-5 pt-10 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="size-8 rounded-full bg-accent flex items-center justify-center">
-            <span className="font-display font-bold text-accent-foreground text-sm">V</span>
+            <span className="font-display font-bold text-accent-foreground text-sm">f</span>
           </div>
-          <span className="font-display font-semibold tracking-tight">voa</span>
+          <span className="font-display font-semibold tracking-tight lowercase">flui</span>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5">
           <Flame className="size-3.5 text-accent" />
@@ -30,7 +42,7 @@ function Home() {
       </header>
 
       <section className="px-5 pt-6">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Olá, Marina</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Olá, {firstName}</p>
         <h1 className="font-display text-[34px] leading-[1.02] font-semibold mt-2 text-balance">
           Você está a <span className="text-accent">63%</span> da fluência B2 em inglês.
         </h1>
