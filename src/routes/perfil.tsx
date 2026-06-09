@@ -73,12 +73,46 @@ function Perfil() {
         </div>
       </section>
 
+      {/* Color customization */}
+      <section className="px-5 mt-7">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Palette className="size-4 text-accent" />
+            <h3 className="font-display text-lg font-semibold">Cor do seu flui</h3>
+          </div>
+          <span className="text-[11px] text-muted-foreground">
+            {ACCENT_PRESETS[currentAccent].label}
+          </span>
+        </div>
+        <div className="rounded-3xl bg-surface border border-border p-4">
+          <div className="grid grid-cols-6 gap-2.5">
+            {(Object.keys(ACCENT_PRESETS) as AccentKey[]).map((k) => {
+              const p = ACCENT_PRESETS[k];
+              const sel = currentAccent === k;
+              return (
+                <button
+                  key={k}
+                  onClick={() => pickColor(k)}
+                  aria-label={p.label}
+                  className={`aspect-square rounded-full flex items-center justify-center transition border-2 ${
+                    sel ? "border-foreground scale-95" : "border-transparent"
+                  }`}
+                  style={{ background: p.swatch }}
+                >
+                  {sel && <Check className="size-4 text-black" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Premium */}
       <section className="px-5 mt-7">
         <div className="rounded-3xl bg-accent text-accent-foreground p-5 relative overflow-hidden glow-accent">
           <Crown className="absolute -right-4 -top-4 size-24 opacity-15" />
           <p className="text-[11px] uppercase tracking-[0.22em] font-semibold opacity-70">
-            Voa Premium
+            flui Premium
           </p>
           <h3 className="font-display text-xl font-semibold mt-1.5 leading-tight">
             Conversas ilimitadas + todos os simulados de intercâmbio.
