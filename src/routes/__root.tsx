@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { ThemeProvider } from "../components/theme-provider";
 
 function NotFoundComponent() {
   return (
@@ -57,10 +58,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Voa — Fluência real para o mundo real" },
+      { title: "flui — Fluência real para o mundo real" },
       { name: "description", content: "Aprenda idiomas com IA, shadowing e simulações reais. Prepare-se para o intercâmbio." },
       { name: "theme-color", content: "#000000" },
-      { property: "og:title", content: "Voa — Fluência real para o mundo real" },
+      { property: "og:title", content: "flui — Fluência real para o mundo real" },
       { property: "og:description", content: "IA, shadowing e imersão cultural. Fluência prática para o intercâmbio." },
       { property: "og:type", content: "website" },
     ],
@@ -93,7 +94,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <ThemeProvider>
+        <Outlet />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
