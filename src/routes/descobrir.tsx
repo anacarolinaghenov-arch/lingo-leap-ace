@@ -78,7 +78,13 @@ type Recommendation = {
   desc: string;
   level: string;
   emoji: string;
+  image?: string;
 };
+
+const photo = (seed: string) =>
+  `https://i.pravatar.cc/160?u=${encodeURIComponent(seed)}`;
+const cover = (seed: string, bg: string) =>
+  `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
 
 function genRecommendations(
   kind: Kind,
@@ -101,6 +107,7 @@ function genRecommendations(
     return [
       {
         emoji: "📖",
+        image: cover("mango-street", "f59e0b"),
         title: "The House on Mango Street",
         meta: `${lang} · Sandra Cisneros · 110 pgs`,
         desc: `Voz feminina latina, capítulos curtos — ótimo pro seu nível ${userLevel}. Linguagem ${difficulty.toLowerCase()}.`,
@@ -108,6 +115,7 @@ function genRecommendations(
       },
       {
         emoji: "📕",
+        image: cover("such-fun-age", "ef4444"),
         title: "Such a Fun Age",
         meta: `${lang} · Kiley Reid · 320 pgs`,
         desc: `Autora ${genderLabel}${ethLabel}, narrativa contemporânea com diálogos naturais cheios de gírias atuais.`,
@@ -115,6 +123,7 @@ function genRecommendations(
       },
       {
         emoji: "📘",
+        image: cover("educated", "3b82f6"),
         title: "Educated",
         meta: `${lang} · Tara Westover · memórias`,
         desc: `Memórias inspiradoras, narradora ${genderLabel} ${ageLabel === "adolescente" ? "jovem" : ageLabel}. Vocabulário variado.`,
@@ -122,6 +131,7 @@ function genRecommendations(
       },
       {
         emoji: "📙",
+        image: cover("glad-mom-died", "f97316"),
         title: "I'm Glad My Mom Died",
         meta: `${lang} · Jennette McCurdy · 320 pgs`,
         desc: `Autobiografia direta, linguagem do dia a dia. Mistura humor (${vibe.toLowerCase()}) e profundidade.`,
@@ -135,6 +145,7 @@ function genRecommendations(
     return [
       {
         emoji: isFilm ? "🎬" : "📺",
+        image: cover(isFilm ? "past-lives" : "fleabag", "8b5cf6"),
         title: isFilm ? "Past Lives" : "Fleabag",
         meta: `${lang} · ${isFilm ? "A24 · 1h45" : "BBC · 2 temporadas"}`,
         desc: `Protagonista ${genderLabel} ${ageLabel}${ethLabel}. Diálogos naturais, ritmo ${difficulty.toLowerCase()}.`,
@@ -142,6 +153,7 @@ function genRecommendations(
       },
       {
         emoji: isFilm ? "🍿" : "🎞️",
+        image: cover(isFilm ? "lady-bird" : "insecure", "ec4899"),
         title: isFilm ? "Lady Bird" : "Insecure",
         meta: `${lang} · Greta Gerwig / Issa Rae`,
         desc: `Vibe ${vibe.toLowerCase()}. Cheio de expressões idiomáticas reais.`,
@@ -149,6 +161,7 @@ function genRecommendations(
       },
       {
         emoji: "🎭",
+        image: cover(isFilm ? "20th-century" : "master-none", "14b8a6"),
         title: isFilm ? "20th Century Women" : "Master of None",
         meta: `${lang} · ${isFilm ? "drama" : "Netflix"}`,
         desc: `Personagem central ${genderLabel} na faixa ${ageLabel}. Bom pra trabalhar listening contextual.`,
@@ -161,6 +174,7 @@ function genRecommendations(
     return [
       {
         emoji: "🎙️",
+        image: photo("emma-chamberlain"),
         title: "Anything Goes with Emma Chamberlain",
         meta: `${lang} · ~45 min/ep`,
         desc: `Conversas reais, ritmo natural Gen Z. Excelente pra ouvido — vibe ${vibe.toLowerCase()}.`,
@@ -168,6 +182,7 @@ function genRecommendations(
       },
       {
         emoji: "🎧",
+        image: photo("the-daily-nyt"),
         title: "The Daily",
         meta: `${lang} · NYT · ~25 min`,
         desc: `Inglês de jornalismo, claro e bem articulado. Ideal pra acelerar vocabulário formal.`,
@@ -175,6 +190,7 @@ function genRecommendations(
       },
       {
         emoji: "🗣️",
+        image: photo("alex-cooper"),
         title: "Call Her Daddy",
         meta: `${lang} · Alex Cooper · 1h`,
         desc: `Apresentadora ${genderLabel}, gírias atuais, temas pop. Ritmo rápido — bom pra B1+.`,
@@ -187,6 +203,7 @@ function genRecommendations(
     return [
       {
         emoji: "🎵",
+        image: photo("olivia-rodrigo"),
         title: "Olivia Rodrigo — GUTS",
         meta: `${lang} · pop rock`,
         desc: `Letras com inglês conversacional, perfeito pra cantar junto e fixar pronúncia.`,
@@ -194,6 +211,7 @@ function genRecommendations(
       },
       {
         emoji: "🎶",
+        image: photo("sabrina-carpenter"),
         title: "Sabrina Carpenter — Short n' Sweet",
         meta: `${lang} · pop`,
         desc: `Cheio de wordplay e gírias. Vibe ${vibe.toLowerCase()}.`,
@@ -201,6 +219,7 @@ function genRecommendations(
       },
       {
         emoji: "🎤",
+        image: photo("mitski"),
         title: "Mitski — The Land Is Inhospitable",
         meta: `${lang} · indie`,
         desc: `Letras poéticas, ótimo pra vocabulário descritivo e metáforas.`,
@@ -213,6 +232,7 @@ function genRecommendations(
   return [
     {
       emoji: "📹",
+      image: photo(`michelle-khare-${gender}-${age}`),
       title: "Michelle Khare",
       meta: `${lang} · ~12M subs · challenges`,
       desc: `${gender === "Qualquer" ? "Criadora" : genderLabel} na faixa ${ageLabel}${ethLabel}. Fala clara, edição rápida — vibe ${vibe.toLowerCase()}.`,
@@ -220,6 +240,7 @@ function genRecommendations(
     },
     {
       emoji: "✨",
+      image: photo(`patricia-bright-${gender}`),
       title: "Patricia Bright",
       meta: `${lang} · lifestyle & beleza`,
       desc: `British english, ${genderLabel} 30+, ótima pra ouvir sotaque britânico real.`,
@@ -227,6 +248,7 @@ function genRecommendations(
     },
     {
       emoji: "🎥",
+      image: photo(`hannah-witton-${age}`),
       title: "Hannah Witton",
       meta: `${lang} · UK · cultura & livros`,
       desc: `Conteúdo educativo + pessoal. ${difficulty} pra seu nível ${userLevel}.`,
@@ -234,6 +256,7 @@ function genRecommendations(
     },
     {
       emoji: "🌟",
+      image: photo(`yes-theory-${vibe}`),
       title: "Yes Theory",
       meta: `${lang} · viagem & coragem`,
       desc: `Conteúdo inspirador, vários sotaques. Bom pra treinar listening de não-nativos também.`,
@@ -466,8 +489,22 @@ function Descobrir() {
                 className="rounded-3xl bg-surface border border-border p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="size-12 rounded-2xl bg-accent-soft border border-accent/20 flex items-center justify-center text-2xl shrink-0">
-                    {r.emoji}
+                  <div className="size-14 rounded-2xl bg-accent-soft border border-accent/20 overflow-hidden flex items-center justify-center text-2xl shrink-0 relative">
+                    {r.image ? (
+                      <>
+                        <img
+                          src={r.image}
+                          alt={r.title}
+                          loading="lazy"
+                          className="absolute inset-0 size-full object-cover"
+                        />
+                        <span className="absolute -bottom-0.5 -right-0.5 size-6 rounded-full bg-surface border border-border flex items-center justify-center text-xs">
+                          {r.emoji}
+                        </span>
+                      </>
+                    ) : (
+                      r.emoji
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base font-semibold leading-tight">
