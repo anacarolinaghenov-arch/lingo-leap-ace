@@ -81,10 +81,13 @@ type Recommendation = {
   image?: string;
 };
 
-const photo = (seed: string) =>
-  `https://i.pravatar.cc/160?u=${encodeURIComponent(seed)}`;
-const cover = (seed: string, bg: string) =>
-  `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
+// Imagens reais — Wikipedia (Special:FilePath redireciona pro arquivo atual)
+// e Open Library (capas de livros por ISBN). Se a URL quebrar, o <img>
+// dispara onError e o card volta a mostrar só o emoji.
+const wiki = (filename: string) =>
+  `https://en.wikipedia.org/wiki/Special:FilePath/${filename}?width=320`;
+const bookCover = (isbn: string) =>
+  `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
 
 function genRecommendations(
   kind: Kind,
@@ -96,45 +99,44 @@ function genRecommendations(
   language: string,
   userLevel: string,
 ): Recommendation[] {
-  // Mock IA: combina filtros e devolve sugestões plausíveis
   const lang = language === "en" ? "🇺🇸" : language === "es" ? "🇪🇸" : language === "fr" ? "🇫🇷" : "🌐";
   const vibe = vibes[0] ?? "Lifestyle";
-  const ageLabel = age === "Teen" ? "adolescente" : age;
-  const genderLabel = gender === "Qualquer" ? "criadora" : gender.toLowerCase();
-  const ethLabel = ethnicity === "Indiferente" ? "" : `, ${ethnicity.toLowerCase()}`;
+  const filterNote = `Combina com o que você pediu (${[gender, age, ethnicity, vibe]
+    .filter((x) => x && x !== "Qualquer" && x !== "Indiferente")
+    .join(" · ") || "geral"}).`;
 
   if (kind === "livro") {
     return [
       {
         emoji: "📖",
-        image: cover("mango-street", "f59e0b"),
+        image: bookCover("9780679734772"),
         title: "The House on Mango Street",
         meta: `${lang} · Sandra Cisneros · 110 pgs`,
-        desc: `Voz feminina latina, capítulos curtos — ótimo pro seu nível ${userLevel}. Linguagem ${difficulty.toLowerCase()}.`,
+        desc: `Capítulos curtos, prosa poética — ótimo pro nível ${userLevel}. ${filterNote}`,
         level: userLevel,
       },
       {
         emoji: "📕",
-        image: cover("such-fun-age", "ef4444"),
+        image: bookCover("9780525541905"),
         title: "Such a Fun Age",
         meta: `${lang} · Kiley Reid · 320 pgs`,
-        desc: `Autora ${genderLabel}${ethLabel}, narrativa contemporânea com diálogos naturais cheios de gírias atuais.`,
+        desc: `Romance contemporâneo com diálogos naturais e gírias atuais. ${filterNote}`,
         level: userLevel,
       },
       {
         emoji: "📘",
-        image: cover("educated", "3b82f6"),
+        image: bookCover("9780399590504"),
         title: "Educated",
         meta: `${lang} · Tara Westover · memórias`,
-        desc: `Memórias inspiradoras, narradora ${genderLabel} ${ageLabel === "adolescente" ? "jovem" : ageLabel}. Vocabulário variado.`,
+        desc: `Memórias inspiradoras, vocabulário variado, linguagem ${difficulty.toLowerCase()}.`,
         level: userLevel,
       },
       {
         emoji: "📙",
-        image: cover("glad-mom-died", "f97316"),
+        image: bookCover("9781982185824"),
         title: "I'm Glad My Mom Died",
         meta: `${lang} · Jennette McCurdy · 320 pgs`,
-        desc: `Autobiografia direta, linguagem do dia a dia. Mistura humor (${vibe.toLowerCase()}) e profundidade.`,
+        desc: `Autobiografia direta, linguagem do dia a dia. Mistura humor e profundidade.`,
         level: userLevel,
       },
     ];
@@ -142,58 +144,85 @@ function genRecommendations(
 
   if (kind === "filme" || kind === "serie") {
     const isFilm = kind === "filme";
-    return [
-      {
-        emoji: isFilm ? "🎬" : "📺",
-        image: cover(isFilm ? "past-lives" : "fleabag", "8b5cf6"),
-        title: isFilm ? "Past Lives" : "Fleabag",
-        meta: `${lang} · ${isFilm ? "A24 · 1h45" : "BBC · 2 temporadas"}`,
-        desc: `Protagonista ${genderLabel} ${ageLabel}${ethLabel}. Diálogos naturais, ritmo ${difficulty.toLowerCase()}.`,
-        level: userLevel,
-      },
-      {
-        emoji: isFilm ? "🍿" : "🎞️",
-        image: cover(isFilm ? "lady-bird" : "insecure", "ec4899"),
-        title: isFilm ? "Lady Bird" : "Insecure",
-        meta: `${lang} · Greta Gerwig / Issa Rae`,
-        desc: `Vibe ${vibe.toLowerCase()}. Cheio de expressões idiomáticas reais.`,
-        level: userLevel,
-      },
-      {
-        emoji: "🎭",
-        image: cover(isFilm ? "20th-century" : "master-none", "14b8a6"),
-        title: isFilm ? "20th Century Women" : "Master of None",
-        meta: `${lang} · ${isFilm ? "drama" : "Netflix"}`,
-        desc: `Personagem central ${genderLabel} na faixa ${ageLabel}. Bom pra trabalhar listening contextual.`,
-        level: userLevel,
-      },
-    ];
+    return isFilm
+      ? [
+          {
+            emoji: "🎬",
+            image: wiki("Past_Lives_poster.jpeg"),
+            title: "Past Lives",
+            meta: `${lang} · A24 · 1h45`,
+            desc: `Diálogos íntimos e ritmo ${difficulty.toLowerCase()}. ${filterNote}`,
+            level: userLevel,
+          },
+          {
+            emoji: "🍿",
+            image: wiki("Lady_Bird_poster.jpeg"),
+            title: "Lady Bird",
+            meta: `${lang} · Greta Gerwig`,
+            desc: `Vibe ${vibe.toLowerCase()}, cheio de expressões idiomáticas reais.`,
+            level: userLevel,
+          },
+          {
+            emoji: "🎭",
+            image: wiki("20th_Century_Women.png"),
+            title: "20th Century Women",
+            meta: `${lang} · drama`,
+            desc: `Bom pra treinar listening contextual com diálogos longos.`,
+            level: userLevel,
+          },
+        ]
+      : [
+          {
+            emoji: "📺",
+            image: wiki("Fleabag_title_card.jpg"),
+            title: "Fleabag",
+            meta: `${lang} · BBC · 2 temporadas`,
+            desc: `Quebra de quarta parede e inglês britânico real. ${filterNote}`,
+            level: userLevel,
+          },
+          {
+            emoji: "🎞️",
+            image: wiki("Insecure_(TV_series).png"),
+            title: "Insecure",
+            meta: `${lang} · HBO · Issa Rae`,
+            desc: `Vibe ${vibe.toLowerCase()}, gírias atuais e diálogos rápidos.`,
+            level: userLevel,
+          },
+          {
+            emoji: "🎭",
+            image: wiki("Master_of_None_title_card.png"),
+            title: "Master of None",
+            meta: `${lang} · Netflix`,
+            desc: `Episódios independentes — ótimo pra listening contextual.`,
+            level: userLevel,
+          },
+        ];
   }
 
   if (kind === "podcast") {
     return [
       {
         emoji: "🎙️",
-        image: photo("emma-chamberlain"),
+        image: wiki("Emma_Chamberlain_2019_by_Glenn_Francis.jpg"),
         title: "Anything Goes with Emma Chamberlain",
         meta: `${lang} · ~45 min/ep`,
-        desc: `Conversas reais, ritmo natural Gen Z. Excelente pra ouvido — vibe ${vibe.toLowerCase()}.`,
+        desc: `Conversas reais, ritmo natural Gen Z. Vibe ${vibe.toLowerCase()}.`,
         level: userLevel,
       },
       {
         emoji: "🎧",
-        image: photo("the-daily-nyt"),
+        image: wiki("The_Daily_podcast_logo.png"),
         title: "The Daily",
         meta: `${lang} · NYT · ~25 min`,
-        desc: `Inglês de jornalismo, claro e bem articulado. Ideal pra acelerar vocabulário formal.`,
+        desc: `Inglês de jornalismo, claro e bem articulado. Vocabulário formal.`,
         level: userLevel,
       },
       {
         emoji: "🗣️",
-        image: photo("alex-cooper"),
+        image: wiki("Alexandra_Cooper_in_2024.jpg"),
         title: "Call Her Daddy",
         meta: `${lang} · Alex Cooper · 1h`,
-        desc: `Apresentadora ${genderLabel}, gírias atuais, temas pop. Ritmo rápido — bom pra B1+.`,
+        desc: `Gírias atuais e temas pop. Ritmo rápido — bom pra B1+.`,
         level: userLevel,
       },
     ];
@@ -203,15 +232,15 @@ function genRecommendations(
     return [
       {
         emoji: "🎵",
-        image: photo("olivia-rodrigo"),
+        image: wiki("Olivia_Rodrigo_-_Guts.png"),
         title: "Olivia Rodrigo — GUTS",
         meta: `${lang} · pop rock`,
-        desc: `Letras com inglês conversacional, perfeito pra cantar junto e fixar pronúncia.`,
+        desc: `Letras com inglês conversacional — perfeito pra cantar junto e fixar pronúncia.`,
         level: userLevel,
       },
       {
         emoji: "🎶",
-        image: photo("sabrina-carpenter"),
+        image: wiki("Sabrina_Carpenter_-_Short_n%27_Sweet.png"),
         title: "Sabrina Carpenter — Short n' Sweet",
         meta: `${lang} · pop`,
         desc: `Cheio de wordplay e gírias. Vibe ${vibe.toLowerCase()}.`,
@@ -219,7 +248,7 @@ function genRecommendations(
       },
       {
         emoji: "🎤",
-        image: photo("mitski"),
+        image: wiki("Mitski_-_The_Land_Is_Inhospitable_and_So_Are_We.png"),
         title: "Mitski — The Land Is Inhospitable",
         meta: `${lang} · indie`,
         desc: `Letras poéticas, ótimo pra vocabulário descritivo e metáforas.`,
@@ -228,27 +257,27 @@ function genRecommendations(
     ];
   }
 
-  // youtuber / influencer
+  // youtuber / influencer — fotos oficiais via Wikipedia
   return [
     {
       emoji: "📹",
-      image: photo(`michelle-khare-${gender}-${age}`),
+      image: wiki("Michelle_Khare_by_Gage_Skidmore.jpg"),
       title: "Michelle Khare",
-      meta: `${lang} · ~12M subs · challenges`,
-      desc: `${gender === "Qualquer" ? "Criadora" : genderLabel} na faixa ${ageLabel}${ethLabel}. Fala clara, edição rápida — vibe ${vibe.toLowerCase()}.`,
+      meta: `${lang} · ~4M subs · challenges`,
+      desc: `Fala clara, edição rápida, vibe ${vibe.toLowerCase()}. ${filterNote}`,
       level: userLevel,
     },
     {
       emoji: "✨",
-      image: photo(`patricia-bright-${gender}`),
+      image: wiki("Patricia_Bright_2017.jpg"),
       title: "Patricia Bright",
-      meta: `${lang} · lifestyle & beleza`,
-      desc: `British english, ${genderLabel} 30+, ótima pra ouvir sotaque britânico real.`,
+      meta: `${lang} · UK · lifestyle & beleza`,
+      desc: `Sotaque britânico real, conteúdo de lifestyle e carreira.`,
       level: userLevel,
     },
     {
       emoji: "🎥",
-      image: photo(`hannah-witton-${age}`),
+      image: wiki("Hannah_Witton_2016.jpg"),
       title: "Hannah Witton",
       meta: `${lang} · UK · cultura & livros`,
       desc: `Conteúdo educativo + pessoal. ${difficulty} pra seu nível ${userLevel}.`,
@@ -256,10 +285,10 @@ function genRecommendations(
     },
     {
       emoji: "🌟",
-      image: photo(`yes-theory-${vibe}`),
+      image: wiki("Yes_Theory_logo.png"),
       title: "Yes Theory",
       meta: `${lang} · viagem & coragem`,
-      desc: `Conteúdo inspirador, vários sotaques. Bom pra treinar listening de não-nativos também.`,
+      desc: `Conteúdo inspirador, vários sotaques. Bom pra listening de não-nativos.`,
       level: userLevel,
     },
   ];
@@ -489,23 +518,8 @@ function Descobrir() {
                 className="rounded-3xl bg-surface border border-border p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="size-14 rounded-2xl bg-accent-soft border border-accent/20 overflow-hidden flex items-center justify-center text-2xl shrink-0 relative">
-                    {r.image ? (
-                      <>
-                        <img
-                          src={r.image}
-                          alt={r.title}
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover"
-                        />
-                        <span className="absolute -bottom-0.5 -right-0.5 size-6 rounded-full bg-surface border border-border flex items-center justify-center text-xs">
-                          {r.emoji}
-                        </span>
-                      </>
-                    ) : (
-                      r.emoji
-                    )}
-                  </div>
+                  <RecThumb image={r.image} emoji={r.emoji} title={r.title} />
+
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base font-semibold leading-tight">
                       {r.title}
@@ -544,7 +558,34 @@ function Descobrir() {
   );
 }
 
+function RecThumb({ image, emoji, title }: { image?: string; emoji: string; title: string }) {
+  const [broken, setBroken] = useState(false);
+  const showImg = !!image && !broken;
+  return (
+    <div className="size-14 rounded-2xl bg-accent-soft border border-accent/20 overflow-hidden flex items-center justify-center text-2xl shrink-0 relative">
+      {showImg ? (
+        <>
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setBroken(true)}
+            className="absolute inset-0 size-full object-cover"
+          />
+          <span className="absolute -bottom-0.5 -right-0.5 size-6 rounded-full bg-surface border border-border flex items-center justify-center text-xs">
+            {emoji}
+          </span>
+        </>
+      ) : (
+        emoji
+      )}
+    </div>
+  );
+}
+
 function SectionLabel({ n, t, extra }: { n: string; t: string; extra?: string }) {
+
   return (
     <div className="flex items-end justify-between">
       <div>
