@@ -78,7 +78,13 @@ type Recommendation = {
   desc: string;
   level: string;
   emoji: string;
+  image?: string;
 };
+
+const photo = (seed: string) =>
+  `https://i.pravatar.cc/160?u=${encodeURIComponent(seed)}`;
+const cover = (seed: string, bg: string) =>
+  `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
 
 function genRecommendations(
   kind: Kind,
