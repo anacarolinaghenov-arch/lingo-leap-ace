@@ -558,7 +558,34 @@ function Descobrir() {
   );
 }
 
+function RecThumb({ image, emoji, title }: { image?: string; emoji: string; title: string }) {
+  const [broken, setBroken] = useState(false);
+  const showImg = !!image && !broken;
+  return (
+    <div className="size-14 rounded-2xl bg-accent-soft border border-accent/20 overflow-hidden flex items-center justify-center text-2xl shrink-0 relative">
+      {showImg ? (
+        <>
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setBroken(true)}
+            className="absolute inset-0 size-full object-cover"
+          />
+          <span className="absolute -bottom-0.5 -right-0.5 size-6 rounded-full bg-surface border border-border flex items-center justify-center text-xs">
+            {emoji}
+          </span>
+        </>
+      ) : (
+        emoji
+      )}
+    </div>
+  );
+}
+
 function SectionLabel({ n, t, extra }: { n: string; t: string; extra?: string }) {
+
   return (
     <div className="flex items-end justify-between">
       <div>
