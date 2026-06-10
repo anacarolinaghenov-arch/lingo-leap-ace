@@ -518,23 +518,8 @@ function Descobrir() {
                 className="rounded-3xl bg-surface border border-border p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="size-14 rounded-2xl bg-accent-soft border border-accent/20 overflow-hidden flex items-center justify-center text-2xl shrink-0 relative">
-                    {r.image ? (
-                      <>
-                        <img
-                          src={r.image}
-                          alt={r.title}
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover"
-                        />
-                        <span className="absolute -bottom-0.5 -right-0.5 size-6 rounded-full bg-surface border border-border flex items-center justify-center text-xs">
-                          {r.emoji}
-                        </span>
-                      </>
-                    ) : (
-                      r.emoji
-                    )}
-                  </div>
+                  <RecThumb image={r.image} emoji={r.emoji} title={r.title} />
+
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base font-semibold leading-tight">
                       {r.title}
