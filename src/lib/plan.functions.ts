@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
+import { generateObject } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
@@ -16,18 +16,15 @@ const PlanSchema = z.object({
   title: z.string(),
   summary: z.string(),
   ageInsight: z.string(),
-  weeks: z
-    .array(
-      z.object({
-        week: z.number(),
-        focus: z.string(),
-        activities: z.array(z.string()).min(2).max(5),
-      }),
-    )
-    .min(3)
-    .max(4),
-  dailyRoutine: z.array(z.string()).min(3).max(5),
-  tips: z.array(z.string()).min(2).max(4),
+  weeks: z.array(
+    z.object({
+      week: z.number(),
+      focus: z.string(),
+      activities: z.array(z.string()),
+    }),
+  ),
+  dailyRoutine: z.array(z.string()),
+  tips: z.array(z.string()),
 });
 
 export type GeneratedPlan = z.infer<typeof PlanSchema>;
@@ -58,11 +55,11 @@ Considere COMO o cérebro aprende em cada faixa etária:
 
 Gere um plano de 4 semanas, prático e realista no tempo diário informado. Linguagem acolhedora, sem clichês.`;
 
-    const { experimental_output } = await generateText({
+    const { object } = await generateObject({
       model: gateway("google/gemini-3-flash-preview"),
-      experimental_output: Output.object({ schema: PlanSchema }),
+      schema: PlanSchema,
       prompt,
     });
 
-    return experimental_output as GeneratedPlan;
+    return object as GeneratedPlan;
   });
