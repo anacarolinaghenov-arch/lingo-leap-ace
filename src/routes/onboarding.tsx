@@ -55,8 +55,22 @@ function Onboarding() {
   const [goal, setGoal] = useState("intercambio");
   const [dailyMinutes, setDailyMinutes] = useState(20);
   const [accent, setAccent] = useState<AccentKey>("lime");
+  const [plan, setPlan] = useState<LearningPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
 
-  const steps = ["nome", "idade", "idioma", "nível", "objetivo", "tempo", "cor"] as const;
+  const genPlan = useServerFn(generateLearningPlan);
+
+  const steps = [
+    "nome",
+    "idade",
+    "idioma",
+    "nível",
+    "objetivo",
+    "tempo",
+    "cor",
+    "plano",
+  ] as const;
   const total = steps.length;
   const progress = ((step + 1) / total) * 100;
 
@@ -65,7 +79,38 @@ function Onboarding() {
     applyAccent(k);
   }
 
+  async function requestPlan() {
+    setPlanLoading(true);
+    setPlanError(null);
+    try {
+      const langLabel = LANGUAGES.find((l) => l.code === language)?.label ?? language;
+      const goalLabel = GOALS.find((g) => g.v === goal)?.l ?? goal;
+      const result = await genPlan({
+        data: {
+          name: name.trim() || "Você",
+          age,
+          language: langLabel,
+          level,
+          goal: goalLabel,
+          dailyMinutes,
+        },
+      });
+      setPlan(result);
+    } catch (e) {
+      setPlanError(
+        e instanceof Error ? e.message : "Não consegui gerar seu plano agora. Tente novamente.",
+      );
+    } finally {
+      setPlanLoading(false);
+    }
+  }
+
   function next() {
+    if (step === 6) {
+      setStep(7);
+      if (!plan && !planLoading) void requestPlan();
+      return;
+    }
     if (step < total - 1) setStep(step + 1);
   }
   function back() {
@@ -81,6 +126,7 @@ function Onboarding() {
       goal,
       dailyMinutes,
       accent,
+      plan: plan ?? undefined,
     };
     writeProfile(profile);
     applyAccent(accent);
@@ -93,10 +139,14 @@ function Onboarding() {
         return name.trim().length >= 2;
       case 1:
         return Number(age) >= 8 && Number(age) <= 99;
+      case 7:
+        return !planLoading;
       default:
         return true;
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground flex justify-center">
