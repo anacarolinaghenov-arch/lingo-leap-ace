@@ -152,6 +152,16 @@ export const ACCENT_PRESETS: Record<
   },
 };
 
+export type PlanWeek = { week: number; focus: string; activities: string[] };
+export type LearningPlan = {
+  title: string;
+  summary: string;
+  ageInsight: string;
+  weeks: PlanWeek[];
+  dailyRoutine: string[];
+  tips: string[];
+};
+
 export type Profile = {
   name: string;
   age: string;
@@ -160,6 +170,7 @@ export type Profile = {
   goal: string;
   dailyMinutes: number;
   accent: AccentKey;
+  plan?: LearningPlan;
 };
 
 const KEY = "flui_profile_v1";
