@@ -1,13 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, ArrowLeft, Check, Sparkles, Loader2 } from "lucide-react";
 import {
   ACCENT_PRESETS,
   writeProfile,
   type AccentKey,
+  type LearningPlan,
   type Profile,
 } from "@/lib/profile-store";
 import { applyAccent } from "@/components/theme-provider";
+import { generateLearningPlan } from "@/lib/plan.functions";
+
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({ meta: [{ title: "flui — Criar conta" }] }),
@@ -51,8 +55,22 @@ function Onboarding() {
   const [goal, setGoal] = useState("intercambio");
   const [dailyMinutes, setDailyMinutes] = useState(20);
   const [accent, setAccent] = useState<AccentKey>("lime");
+  const [plan, setPlan] = useState<LearningPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
 
-  const steps = ["nome", "idade", "idioma", "nível", "objetivo", "tempo", "cor"] as const;
+  const genPlan = useServerFn(generateLearningPlan);
+
+  const steps = [
+    "nome",
+    "idade",
+    "idioma",
+    "nível",
+    "objetivo",
+    "tempo",
+    "cor",
+    "plano",
+  ] as const;
   const total = steps.length;
   const progress = ((step + 1) / total) * 100;
 
@@ -61,7 +79,38 @@ function Onboarding() {
     applyAccent(k);
   }
 
+  async function requestPlan() {
+    setPlanLoading(true);
+    setPlanError(null);
+    try {
+      const langLabel = LANGUAGES.find((l) => l.code === language)?.label ?? language;
+      const goalLabel = GOALS.find((g) => g.v === goal)?.l ?? goal;
+      const result = await genPlan({
+        data: {
+          name: name.trim() || "Você",
+          age,
+          language: langLabel,
+          level,
+          goal: goalLabel,
+          dailyMinutes,
+        },
+      });
+      setPlan(result);
+    } catch (e) {
+      setPlanError(
+        e instanceof Error ? e.message : "Não consegui gerar seu plano agora. Tente novamente.",
+      );
+    } finally {
+      setPlanLoading(false);
+    }
+  }
+
   function next() {
+    if (step === 6) {
+      setStep(7);
+      if (!plan && !planLoading) void requestPlan();
+      return;
+    }
     if (step < total - 1) setStep(step + 1);
   }
   function back() {
@@ -77,6 +126,7 @@ function Onboarding() {
       goal,
       dailyMinutes,
       accent,
+      plan: plan ?? undefined,
     };
     writeProfile(profile);
     applyAccent(accent);
@@ -89,10 +139,14 @@ function Onboarding() {
         return name.trim().length >= 2;
       case 1:
         return Number(age) >= 8 && Number(age) <= 99;
+      case 7:
+        return !planLoading;
       default:
         return true;
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground flex justify-center">
@@ -331,16 +385,127 @@ function Onboarding() {
             </Step>
           )}
 
+          {step === 7 && (
+            <Step
+              eyebrow="08 · Seu plano"
+              title={`Um plano feito para os seus ${age || "—"} anos`}
+              hint="Nossa IA considera como o seu cérebro aprende melhor nessa fase da vida."
+            >
+              {planLoading && (
+                <div className="rounded-2xl border border-border bg-surface p-6 flex flex-col items-center gap-3 text-center">
+                  <Loader2 className="size-6 animate-spin text-accent" />
+                  <p className="text-sm text-muted-foreground">
+                    Montando seu plano personalizado…
+                  </p>
+                </div>
+              )}
+
+              {planError && !planLoading && (
+                <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+                  <p className="font-medium mb-2">Algo deu errado.</p>
+                  <p className="text-muted-foreground text-xs mb-3">{planError}</p>
+                  <button
+                    onClick={requestPlan}
+                    className="text-xs font-semibold underline underline-offset-2"
+                  >
+                    Tentar de novo
+                  </button>
+                </div>
+              )}
+
+              {plan && !planLoading && (
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-accent/40 bg-accent-soft p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="size-4 text-accent" />
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                        Plano gerado por IA
+                      </p>
+                    </div>
+                    <p className="font-display text-lg leading-tight">{plan.title}</p>
+                    <p className="text-sm text-muted-foreground mt-2">{plan.summary}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-surface p-4">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                      Por que assim para você
+                    </p>
+                    <p className="text-sm">{plan.ageInsight}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-surface p-4">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
+                      Sua rotina diária
+                    </p>
+                    <ul className="space-y-1.5">
+                      {plan.dailyRoutine.map((r, i) => (
+                        <li key={i} className="text-sm flex gap-2">
+                          <span className="text-accent">•</span>
+                          <span>{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    {plan.weeks.map((w) => (
+                      <div
+                        key={w.week}
+                        className="rounded-2xl border border-border bg-surface p-4"
+                      >
+                        <div className="flex items-baseline gap-2 mb-2">
+                          <span className="font-display text-xl font-semibold">
+                            S{w.week}
+                          </span>
+                          <span className="text-sm font-medium">{w.focus}</span>
+                        </div>
+                        <ul className="space-y-1">
+                          {w.activities.map((a, i) => (
+                            <li key={i} className="text-xs text-muted-foreground flex gap-2">
+                              <span>›</span>
+                              <span>{a}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-surface p-4">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                      Dicas para você
+                    </p>
+                    <ul className="space-y-1.5">
+                      {plan.tips.map((t, i) => (
+                        <li key={i} className="text-sm flex gap-2">
+                          <span className="text-accent">★</span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </Step>
+          )}
+
           <div className="mt-auto pt-8">
             <button
               onClick={step === total - 1 ? finish : next}
               disabled={!canNext()}
               className="w-full rounded-full bg-accent text-accent-foreground font-semibold py-4 flex items-center justify-center gap-2 disabled:opacity-40 transition"
             >
-              {step === total - 1 ? "Entrar no flui" : "Continuar"}
-              <ArrowRight className="size-4" />
+              {step === total - 1
+                ? planLoading
+                  ? "Gerando plano…"
+                  : "Entrar no flui"
+                : step === 6
+                  ? "Gerar meu plano"
+                  : "Continuar"}
+              {!planLoading && <ArrowRight className="size-4" />}
             </button>
           </div>
+
         </div>
       </div>
     </div>
