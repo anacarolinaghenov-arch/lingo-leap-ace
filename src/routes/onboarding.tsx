@@ -1,13 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, ArrowLeft, Check, Sparkles, Loader2 } from "lucide-react";
 import {
   ACCENT_PRESETS,
   writeProfile,
   type AccentKey,
+  type LearningPlan,
   type Profile,
 } from "@/lib/profile-store";
 import { applyAccent } from "@/components/theme-provider";
+import { generateLearningPlan } from "@/lib/plan.functions";
+
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({ meta: [{ title: "flui — Criar conta" }] }),
