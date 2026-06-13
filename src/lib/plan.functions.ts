@@ -16,18 +16,15 @@ const PlanSchema = z.object({
   title: z.string(),
   summary: z.string(),
   ageInsight: z.string(),
-  weeks: z
-    .array(
-      z.object({
-        week: z.number(),
-        focus: z.string(),
-        activities: z.array(z.string()).min(2).max(5),
-      }),
-    )
-    .min(3)
-    .max(4),
-  dailyRoutine: z.array(z.string()).min(3).max(5),
-  tips: z.array(z.string()).min(2).max(4),
+  weeks: z.array(
+    z.object({
+      week: z.number(),
+      focus: z.string(),
+      activities: z.array(z.string()),
+    }),
+  ),
+  dailyRoutine: z.array(z.string()),
+  tips: z.array(z.string()),
 });
 
 export type GeneratedPlan = z.infer<typeof PlanSchema>;
