@@ -55,11 +55,11 @@ Considere COMO o cérebro aprende em cada faixa etária:
 
 Gere um plano de 4 semanas, prático e realista no tempo diário informado. Linguagem acolhedora, sem clichês.`;
 
-    const { experimental_output } = await generateText({
+    const { object } = await generateObject({
       model: gateway("google/gemini-3-flash-preview"),
-      experimental_output: Output.object({ schema: PlanSchema }),
+      schema: PlanSchema,
       prompt,
     });
 
-    return experimental_output as GeneratedPlan;
+    return object as GeneratedPlan;
   });
