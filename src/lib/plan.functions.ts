@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
@@ -29,16 +29,41 @@ const PlanSchema = z.object({
 
 export type GeneratedPlan = z.infer<typeof PlanSchema>;
 
+function extractJSON(raw: string): unknown {
+  let cleaned = raw
+    .replace(/^```json\s*/im, "")
+    .replace(/^```\s*/im, "")
+    .replace(/```\s*$/im, "")
+    .trim();
+  if (!cleaned.startsWith("{") && !cleaned.startsWith("[")) {
+    const s = cleaned.indexOf("{");
+    const e = cleaned.lastIndexOf("}");
+    if (s !== -1 && e > s) cleaned = cleaned.slice(s, e + 1);
+    else throw new Error("Resposta sem JSON válido");
+  }
+  return JSON.parse(cleaned);
+}
+
 export const generateLearningPlan = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<GeneratedPlan> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
     const gateway = createLovableAiGatewayProvider(key);
 
-    const prompt = `Você é um especialista em aprendizado de idiomas e neurociência cognitiva.
-Crie um plano de estudos PERSONALIZADO em português do Brasil para:
+    const system = `Você é um especialista em aprendizado de idiomas e neurociência cognitiva.
+Responda APENAS com JSON válido (sem markdown, sem \`\`\`), no formato exato:
+{
+  "title": string,
+  "summary": string,
+  "ageInsight": string,
+  "weeks": [{"week": number, "focus": string, "activities": string[]}],
+  "dailyRoutine": string[],
+  "tips": string[]
+}`;
+
+    const prompt = `Crie um plano de estudos PERSONALIZADO em português do Brasil para:
 
 - Nome: ${data.name}
 - Idade: ${data.age} anos
@@ -53,13 +78,16 @@ Considere COMO o cérebro aprende em cada faixa etária:
 - 35-50 anos: contextualização, conexão com vida real/trabalho, menos memorização bruta.
 - 50+: ritmo gentil, repetição espaçada, foco em compreensão antes de produção.
 
-Gere um plano de 4 semanas, prático e realista no tempo diário informado. Linguagem acolhedora, sem clichês.`;
+Gere um plano de 4 semanas (weeks com 4 itens), prático e realista no tempo diário informado.
+dailyRoutine: 3 a 5 itens. tips: 3 a 5 itens. Linguagem acolhedora, sem clichês.
+Retorne SOMENTE o JSON.`;
 
-    const { object } = await generateObject({
-      model: gateway("google/gemini-3-flash-preview"),
-      schema: PlanSchema,
+    const { text } = await generateText({
+      model: gateway("google/gemini-2.5-flash"),
+      system,
       prompt,
     });
 
-    return object as GeneratedPlan;
+    const parsed = PlanSchema.parse(extractJSON(text));
+    return parsed;
   });
