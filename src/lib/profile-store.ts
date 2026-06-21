@@ -153,6 +153,12 @@ export const ACCENT_PRESETS: Record<
 };
 
 export type PlanWeek = { week: number; focus: string; activities: string[] };
+export type Recommendation = { title: string; creator?: string; why: string };
+export type VocabItem = { word: string; translation: string; example: string };
+export type ComprehensionQ = { question: string; options: string[]; answer: number };
+export type Flashcard = { front: string; back: string };
+export type MusicPlatform = "spotify" | "apple" | "youtube" | "outro";
+
 export type LearningPlan = {
   title: string;
   summary: string;
@@ -160,6 +166,12 @@ export type LearningPlan = {
   weeks: PlanWeek[];
   dailyRoutine: string[];
   tips: string[];
+  series?: Recommendation[];
+  songs?: Recommendation[];
+  podcasts?: Recommendation[];
+  vocabulary?: VocabItem[];
+  comprehension?: ComprehensionQ[];
+  flashcards?: Flashcard[];
 };
 
 export type Profile = {
@@ -170,6 +182,10 @@ export type Profile = {
   goal: string;
   dailyMinutes: number;
   accent: AccentKey;
+  favoriteSeries?: string;
+  favoriteSongs?: string;
+  favoritePodcasts?: string;
+  musicPlatform?: MusicPlatform;
   plan?: LearningPlan;
 };
 
